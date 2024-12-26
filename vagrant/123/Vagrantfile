@@ -1,0 +1,22 @@
+
+    Vagrant.configure('2') do |config|
+        config.vm.define '123' do |vm|
+            vm.vm.box = 'ubuntu/bionic64'
+            vm.vm.network 'public_network', bridge: true
+            vm.vm.provider 'vmware_workstation' do |v|
+                v.vmx['memsize'] = '2080'
+                v.vmx['numvcpus'] = '2'
+                v.vmx['displayName'] = '123'
+                v.vmx['scsi0:0.fileName'] = 'storage.vmdk'
+                v.vmx['scsi0:0.present'] = 'TRUE'
+                v.vmx['scsi0:0.deviceType'] = 'scsi-hardDisk'
+                v.vmx['scsi0:0.mode'] = 'persistent'
+                v.vmx['scsi0:0.redo'] = ''
+                unless File.exist?('#{ storage.vmdk }')
+                    v.customize ['createhd', '--filename', '#{ storage.vmdk }', '--size', '#{ 10240 }']
+                end
+                v.customize ['storageattach', :id, '--storagectl', 'SCSI Controller', '--port', 0, '--device', 0, '--type', 'disk', '--medium', '#{ storage.vmdk }']
+            end
+        end
+    end
+    

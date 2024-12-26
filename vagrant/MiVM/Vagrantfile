@@ -1,0 +1,16 @@
+
+Vagrant.configure('2') do |config|
+    config.vm.define 'MiVM' do |vm|
+        vm.vm.box = 'ubuntu/bionic64'
+        vm.vm.network 'public_network', bridge: 'en0: Wi-Fi (AirPort)' # Primera interfaz en modo bridge
+        vm.vm.network 'public_network', bridge: 'en0: Wi-Fi (AirPort)' # Segunda interfaz en modo bridge
+        vm.vm.provider 'virtualbox' do |vb|
+            vb.memory = '2080'
+            vb.cpus = '2'
+            unless File.exist?('#{ storage.vdi }')
+                vb.customize ['createhd', '--filename', '#{ storage.vdi }', '--size', '#{ 10240 }']
+            end
+            vb.customize ['storageattach', :id, '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', '#{ storage.vdi }']
+        end
+    end
+end
